@@ -62,6 +62,10 @@ const RELIGION_COLORS: Record<string, string> = {
   "христианство": "#8b0000", "ислам": "#006400", "иудаизм": "#b8860b",
   "хазарская вера": "#4a0082", "khazar faith": "#4a0082",
 };
+const RELIGION_ICONS: Record<string, string> = {
+  "христианство": "&#9769;", "ислам": "&#9770;", "иудаизм": "&#10017;",
+  "хазарская вера": "&#9788;", "khazar faith": "&#9788;",
+};
 
 function renderPage(body: string, title = "Хазарский словарь") {
   return `<!DOCTYPE html>
@@ -143,10 +147,10 @@ function renderCharacterCard(ch: Character) {
   const relColor = RELIGION_COLORS[ch.religion] || "#666";
   const typeLabel = TYPE_LABELS[ch.type] || ch.type;
   const genderIcon = ch.gender === "female" ? "&#9792;" : ch.gender === "male" ? "&#9794;" : "";
-  const srcCount = ch.sources.length;
+  const relIcon = RELIGION_ICONS[ch.religion] || "";
 
   let html = `<div class="card">`;
-  html += `<div class="card-name"><a href="/char/${encodeURIComponent(ch.name)}">${escHtml(ch.name)}</a> ${genderIcon}</div>`;
+  html += `<div class="card-name"><a href="/char/${encodeURIComponent(ch.name)}">${escHtml(ch.name)}</a> ${genderIcon} ${relIcon}</div>`;
   if (ch.aliases?.length) html += `<div class="card-aliases">${ch.aliases.map(escHtml).join(", ")}</div>`;
   html += `<div class="card-meta">`;
   html += `<span class="badge" style="background:${relColor}">${escHtml(ch.religion)}</span> `;
@@ -154,7 +158,8 @@ function renderCharacterCard(ch: Character) {
   if (ch.epoch) html += ` <span>${escHtml(ch.epoch)}</span>`;
   html += `</div>`;
   html += `<div class="card-desc">${escHtml(ch.description)}</div>`;
-  html += `<div class="card-sources">${srcCount} источник${srcCount > 4 ? "ов" : srcCount > 1 ? "а" : ""}</div>`;
+  const srcLinks = ch.sources.map((s) => `<li><a href="/${s.article}">${escHtml(s.article.split("/").pop()!)}</a></li>`).join("");
+  html += `<ul class="card-sources">${srcLinks}</ul>`;
   html += `</div>`;
   return html;
 }
@@ -163,8 +168,9 @@ function renderCharacterPage(ch: Character) {
   const relColor = RELIGION_COLORS[ch.religion] || "#666";
   const typeLabel = TYPE_LABELS[ch.type] || ch.type;
   const genderIcon = ch.gender === "female" ? "&#9792;" : ch.gender === "male" ? "&#9794;" : "";
+  const relIcon = RELIGION_ICONS[ch.religion] || "";
 
-  let html = `<h1>${escHtml(ch.name)} ${genderIcon}</h1>`;
+  let html = `<h1>${escHtml(ch.name)} ${genderIcon} ${relIcon}</h1>`;
   if (ch.aliases?.length) html += `<p class="card-aliases">${ch.aliases.map(escHtml).join(", ")}</p>`;
   html += `<p><span class="badge" style="background:${relColor}">${escHtml(ch.religion)}</span> ${typeLabel}`;
   if (ch.epoch) html += ` &middot; ${escHtml(ch.epoch)}`;
